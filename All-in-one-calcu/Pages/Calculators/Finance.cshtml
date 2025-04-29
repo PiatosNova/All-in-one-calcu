@@ -1,0 +1,468 @@
+@page
+@model All_in_one_calcu.Pages.Calculators.FinanceModel
+@{
+    ViewData["Title"] = "Finance Calculator";
+}
+
+<div class="calculator-layout">
+    <div class="calculator-container">
+        <h2 class="mb-4">Finance Calculator</h2>
+
+        <!-- Calculator Type Selection -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="calculatorType" id="loan" value="loan" checked>
+                    <label class="btn btn-outline-primary" for="loan">
+                        <i class="bi bi-cash"></i> Loan Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="mortgage" value="mortgage">
+                    <label class="btn btn-outline-primary" for="mortgage">
+                        <i class="bi bi-house"></i> Mortgage Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="interest" value="interest">
+                    <label class="btn btn-outline-primary" for="interest">
+                        <i class="bi bi-percent"></i> Interest Calculator
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loan Calculator -->
+        <div class="card mb-4" id="loanCalculator">
+            <div class="card-header">
+                <h5 class="mb-0">Loan Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="loanAmount" class="form-label">Loan Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="loanAmount" placeholder="Enter loan amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="loanTerm" class="form-label">Loan Term (Years)</label>
+                            <input type="number" class="form-control" id="loanTerm" placeholder="Enter loan term">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="loanRate" class="form-label">Annual Interest Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="loanRate" placeholder="Enter interest rate">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="loanFrequency" class="form-label">Payment Frequency</label>
+                            <select class="form-select" id="loanFrequency">
+                                <option value="monthly">Monthly</option>
+                                <option value="biweekly">Bi-Weekly</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateLoan()">Calculate</button>
+                    </div>
+                </div>
+
+                <!-- Loan Results -->
+                <div class="mt-4" id="loanResults" style="display: none;">
+                    <h6>Loan Summary</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Monthly Payment:</td>
+                                <td id="monthlyPayment">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Total Interest:</td>
+                                <td id="totalInterest">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Total Payment:</td>
+                                <td id="totalPayment">$0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mortgage Calculator -->
+        <div class="card mb-4" id="mortgageCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">Mortgage Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="homePrice" class="form-label">Home Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="homePrice" placeholder="Enter home price">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="downPayment" class="form-label">Down Payment</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="downPayment" placeholder="Enter down payment">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="mortgageTerm" class="form-label">Mortgage Term (Years)</label>
+                            <select class="form-select" id="mortgageTerm">
+                                <option value="30">30 Years</option>
+                                <option value="15">15 Years</option>
+                                <option value="10">10 Years</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="mortgageRate" class="form-label">Interest Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="mortgageRate" placeholder="Enter interest rate">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateMortgage()">Calculate</button>
+                    </div>
+                </div>
+
+                <!-- Mortgage Results -->
+                <div class="mt-4" id="mortgageResults" style="display: none;">
+                    <h6>Mortgage Summary</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Monthly Payment:</td>
+                                <td id="mortgagePayment">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Total Interest:</td>
+                                <td id="mortgageInterest">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Total Payment:</td>
+                                <td id="mortgageTotal">$0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interest Calculator -->
+        <div class="card mb-4" id="interestCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">Interest Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="principal" class="form-label">Principal Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="principal" placeholder="Enter principal amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="interestRate" class="form-label">Interest Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="interestRate" placeholder="Enter interest rate">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="timePeriod" class="form-label">Time Period (Years)</label>
+                            <input type="number" class="form-control" id="timePeriod" placeholder="Enter time period">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="compoundFrequency" class="form-label">Compound Frequency</label>
+                            <select class="form-select" id="compoundFrequency">
+                                <option value="annually">Annually</option>
+                                <option value="semiannually">Semi-Annually</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateInterest()">Calculate</button>
+                    </div>
+                </div>
+
+                <!-- Interest Results -->
+                <div class="mt-4" id="interestResults" style="display: none;">
+                    <h6>Interest Summary</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Simple Interest:</td>
+                                <td id="simpleInterest">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Compound Interest:</td>
+                                <td id="compoundInterest">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Total Amount:</td>
+                                <td id="totalAmount">$0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="history-panel">
+        <div class="history-header">
+            <h5>Recent History</h5>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let calculationHistory = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calculator type selection
+            const calculatorTypes = document.querySelectorAll('input[name="calculatorType"]');
+            calculatorTypes.forEach(type => {
+                type.addEventListener('change', function() {
+                    document.getElementById('loanCalculator').style.display = 'none';
+                    document.getElementById('mortgageCalculator').style.display = 'none';
+                    document.getElementById('interestCalculator').style.display = 'none';
+                    
+                    document.getElementById(this.value + 'Calculator').style.display = 'block';
+                });
+            });
+
+            // Load history from localStorage if available
+            const savedHistory = localStorage.getItem('financeCalculatorHistory');
+            if (savedHistory) {
+                calculationHistory = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
+        });
+
+        // Function to add calculation to history
+        function addToHistory(calculatorType, calculation, result) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Format the calculation string based on calculator type
+            let calculationString = '';
+            
+            switch(calculatorType) {
+                case 'loan':
+                    calculationString = `Loan: $${calculation.amount} for ${calculation.term} years at ${calculation.rate}%`;
+                    break;
+                case 'mortgage':
+                    calculationString = `Mortgage: $${calculation.homePrice} with $${calculation.downPayment} down at ${calculation.rate}%`;
+                    break;
+                case 'interest':
+                    calculationString = `Interest: $${calculation.principal} at ${calculation.rate}% for ${calculation.time} years`;
+                    break;
+            }
+            
+            // Add to beginning of array (newest first)
+            calculationHistory.unshift({
+                calculatorType: calculatorType,
+                calculation: calculationString,
+                result: result,
+                timestamp: timeString,
+                id: Date.now() // Unique ID for each entry
+            });
+            
+            // Keep only the last 10 entries
+            if (calculationHistory.length > 10) {
+                calculationHistory.pop();
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('financeCalculatorHistory', JSON.stringify(calculationHistory));
+            
+            // Update display
+            updateHistoryDisplay();
+        }
+
+        // Function to update history display
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">No calculations yet</div>';
+                return;
+            }
+            
+            calculationHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-content">
+                        <div class="history-calculation">${item.calculation}</div>
+                        <div class="history-result">${item.result}</div>
+                        <div class="history-timestamp">${item.timestamp}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistoryItem(${item.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Function to delete a history item
+        function deleteHistoryItem(id) {
+            calculationHistory = calculationHistory.filter(item => item.id !== id);
+            localStorage.setItem('financeCalculatorHistory', JSON.stringify(calculationHistory));
+            updateHistoryDisplay();
+        }
+
+        // Function to clear all history
+        function clearHistory() {
+            calculationHistory = [];
+            localStorage.removeItem('financeCalculatorHistory');
+            updateHistoryDisplay();
+        }
+
+        // Loan Calculator Functions
+        function calculateLoan() {
+            const amount = parseFloat(document.getElementById('loanAmount').value) || 0;
+            const term = parseFloat(document.getElementById('loanTerm').value) || 0;
+            const rate = parseFloat(document.getElementById('loanRate').value) || 0;
+            const frequency = document.getElementById('loanFrequency').value;
+
+            if (amount && term && rate) {
+                const monthlyRate = rate / 12 / 100;
+                const numberOfPayments = term * 12;
+                const monthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+                                     (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+                const totalPayment = monthlyPayment * numberOfPayments;
+                const totalInterest = totalPayment - amount;
+
+                document.getElementById('monthlyPayment').textContent = `$${monthlyPayment.toFixed(2)}`;
+                document.getElementById('totalInterest').textContent = `$${totalInterest.toFixed(2)}`;
+                document.getElementById('totalPayment').textContent = `$${totalPayment.toFixed(2)}`;
+                document.getElementById('loanResults').style.display = 'block';
+                
+                // Add to history
+                addToHistory('loan', 
+                    { amount: amount, term: term, rate: rate }, 
+                    `Monthly: $${monthlyPayment.toFixed(2)}, Total: $${totalPayment.toFixed(2)}`
+                );
+            }
+        }
+
+        // Mortgage Calculator Functions
+        function calculateMortgage() {
+            const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
+            const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+            const term = parseFloat(document.getElementById('mortgageTerm').value) || 0;
+            const rate = parseFloat(document.getElementById('mortgageRate').value) || 0;
+
+            if (homePrice && downPayment && term && rate) {
+                const loanAmount = homePrice - downPayment;
+                const monthlyRate = rate / 12 / 100;
+                const numberOfPayments = term * 12;
+                const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+                                     (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+                const totalPayment = monthlyPayment * numberOfPayments;
+                const totalInterest = totalPayment - loanAmount;
+
+                document.getElementById('mortgagePayment').textContent = `$${monthlyPayment.toFixed(2)}`;
+                document.getElementById('mortgageInterest').textContent = `$${totalInterest.toFixed(2)}`;
+                document.getElementById('mortgageTotal').textContent = `$${totalPayment.toFixed(2)}`;
+                document.getElementById('mortgageResults').style.display = 'block';
+                
+                // Add to history
+                addToHistory('mortgage', 
+                    { homePrice: homePrice, downPayment: downPayment, rate: rate }, 
+                    `Monthly: $${monthlyPayment.toFixed(2)}, Total: $${totalPayment.toFixed(2)}`
+                );
+            }
+        }
+
+        // Interest Calculator Functions
+        function calculateInterest() {
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const time = parseFloat(document.getElementById('timePeriod').value) || 0;
+            const frequency = document.getElementById('compoundFrequency').value;
+
+            if (principal && rate && time) {
+                // Simple Interest
+                const simpleInterest = principal * (rate / 100) * time;
+                const simpleTotal = principal + simpleInterest;
+
+                // Compound Interest
+                let compoundInterest;
+                switch(frequency) {
+                    case 'annually':
+                        compoundInterest = principal * Math.pow(1 + rate/100, time) - principal;
+                        break;
+                    case 'semiannually':
+                        compoundInterest = principal * Math.pow(1 + rate/200, time * 2) - principal;
+                        break;
+                    case 'quarterly':
+                        compoundInterest = principal * Math.pow(1 + rate/400, time * 4) - principal;
+                        break;
+                    case 'monthly':
+                        compoundInterest = principal * Math.pow(1 + rate/1200, time * 12) - principal;
+                        break;
+                    case 'daily':
+                        compoundInterest = principal * Math.pow(1 + rate/36500, time * 365) - principal;
+                        break;
+                }
+                const compoundTotal = principal + compoundInterest;
+
+                document.getElementById('simpleInterest').textContent = `$${simpleInterest.toFixed(2)}`;
+                document.getElementById('compoundInterest').textContent = `$${compoundInterest.toFixed(2)}`;
+                document.getElementById('totalAmount').textContent = `$${compoundTotal.toFixed(2)}`;
+                document.getElementById('interestResults').style.display = 'block';
+                
+                // Add to history
+                addToHistory('interest', 
+                    { principal: principal, rate: rate, time: time }, 
+                    `Simple: $${simpleInterest.toFixed(2)}, Compound: $${compoundInterest.toFixed(2)}`
+                );
+            }
+        }
+    </script>
+} 

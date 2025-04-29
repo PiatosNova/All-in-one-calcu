@@ -1,0 +1,249 @@
+@page
+@model All_in_one_calcu.Pages.Calculators.StandardModel
+@{
+    ViewData["Title"] = "Standard Calculator";
+}
+
+<div class="calculator-layout">
+    <div class="calculator-container">
+        <h2 class="mb-4">Standard Calculator</h2>
+        
+        <div class="calculator-display" id="display">0</div>
+        
+        <div class="calculator-buttons">
+            <button class="calculator-btn clear" onclick="clearDisplay()">C</button>
+            <button class="calculator-btn operator" onclick="toggleSign()">±</button>
+            <button class="calculator-btn operator" onclick="calculatePercentage()">%</button>
+            <button class="calculator-btn operator" onclick="setOperator('/')">÷</button>
+            
+            <button class="calculator-btn number" onclick="appendNumber('7')">7</button>
+            <button class="calculator-btn number" onclick="appendNumber('8')">8</button>
+            <button class="calculator-btn number" onclick="appendNumber('9')">9</button>
+            <button class="calculator-btn operator" onclick="setOperator('*')">*</button>
+            
+            <button class="calculator-btn number" onclick="appendNumber('4')">4</button>
+            <button class="calculator-btn number" onclick="appendNumber('5')">5</button>
+            <button class="calculator-btn number" onclick="appendNumber('6')">6</button>
+            <button class="calculator-btn operator" onclick="setOperator('-')">-</button>
+            
+            <button class="calculator-btn number" onclick="appendNumber('1')">1</button>
+            <button class="calculator-btn number" onclick="appendNumber('2')">2</button>
+            <button class="calculator-btn number" onclick="appendNumber('3')">3</button>
+            <button class="calculator-btn operator" onclick="setOperator('+')">+</button>
+            
+            <button class="calculator-btn number" onclick="appendNumber('0')">0</button>
+            <button class="calculator-btn number" onclick="appendDecimal()">.</button>
+            <button class="calculator-btn equals" onclick="calculate()" style="grid-column: span 2">=</button>
+        </div>
+    </div>
+
+    <div class="history-panel">
+        <div class="history-header">
+            <h5>Recent History</h5>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentValue = '0';
+        let previousValue = null;
+        let operator = null;
+        let shouldResetDisplay = false;
+        let calculationHistory = [];
+
+        const display = document.getElementById('display');
+        const historyList = document.getElementById('historyList');
+
+        // Load history from localStorage if available
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedHistory = localStorage.getItem('calculatorHistory');
+            if (savedHistory) {
+                calculationHistory = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
+        });
+
+        function updateDisplay() {
+            display.textContent = currentValue;
+        }
+
+        function appendNumber(number) {
+            if (shouldResetDisplay) {
+                currentValue = number;
+                shouldResetDisplay = false;
+            } else {
+                currentValue = currentValue === '0' ? number : currentValue + number;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (shouldResetDisplay) {
+                currentValue = '0.';
+                shouldResetDisplay = false;
+            } else if (!currentValue.includes('.')) {
+                currentValue = currentValue + '.';
+            }
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentValue = '0';
+            previousValue = null;
+            operator = null;
+            shouldResetDisplay = false;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (currentValue !== '0') {
+                currentValue = (parseFloat(currentValue) * -1).toString();
+                updateDisplay();
+            }
+        }
+
+        function calculatePercentage() {
+            currentValue = (parseFloat(currentValue) / 100).toString();
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            if (operator && !shouldResetDisplay) {
+                calculate();
+            }
+            previousValue = parseFloat(currentValue);
+            operator = op;
+            shouldResetDisplay = true;
+        }
+
+        function calculate() {
+            if (!operator || !previousValue) return;
+
+            const current = parseFloat(currentValue);
+            let result;
+
+            switch (operator) {
+                case '+':
+                    result = previousValue + current;
+                    break;
+                case '-':
+                    result = previousValue - current;
+                    break;
+                case '*':
+                    result = previousValue * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        alert('Cannot divide by zero');
+                        clearDisplay();
+                        return;
+                    }
+                    result = previousValue / current;
+                    break;
+            }
+
+            // Format result to avoid floating point precision issues
+            result = Math.round(result * 1000000) / 1000000;
+            
+            // Convert to string and remove trailing zeros after decimal
+            currentValue = result.toString().replace(/\.?0+$/, '');
+            
+            // Add to history
+            addToHistory(`${previousValue} ${operator} ${current} = ${currentValue}`);
+            
+            previousValue = null;
+            operator = null;
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function addToHistory(calculation) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Add to beginning of array (newest first)
+            calculationHistory.unshift({
+                calculation: calculation,
+                timestamp: timeString,
+                id: Date.now() // Unique ID for each entry
+            });
+            
+            // Keep only the last 10 entries
+            if (calculationHistory.length > 10) {
+                calculationHistory.pop();
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('calculatorHistory', JSON.stringify(calculationHistory));
+            
+            // Update display
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">No calculations yet</div>';
+                return;
+            }
+            
+            calculationHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-content">
+                        <div class="history-calculation">${item.calculation}</div>
+                        <div class="history-timestamp">${item.timestamp}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistoryItem(${item.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        function deleteHistoryItem(id) {
+            calculationHistory = calculationHistory.filter(item => item.id !== id);
+            localStorage.setItem('calculatorHistory', JSON.stringify(calculationHistory));
+            updateHistoryDisplay();
+        }
+
+        function clearHistory() {
+            calculationHistory = [];
+            localStorage.removeItem('calculatorHistory');
+            updateHistoryDisplay();
+        }
+
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+            } else if (key === '.') {
+                appendDecimal();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            } else if (key === '=' || key === 'Enter') {
+                calculate();
+            } else if (key === '+') {
+                setOperator('+');
+            } else if (key === '-') {
+                setOperator('-');
+            } else if (key === '*') {
+                setOperator('*');
+            } else if (key === '/') {
+                setOperator('/');
+            } else if (key === '%') {
+                calculatePercentage();
+            }
+        });
+    </script>
+} 

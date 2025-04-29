@@ -1,0 +1,352 @@
+@page
+@model All_in_one_calcu.Pages.Calculators.CurrencyConverterModel
+@{
+    ViewData["Title"] = "Currency Converter";
+}
+
+<div class="converter-layout">
+    <div class="converter-container">
+        <h2 class="mb-4">Currency Converter</h2>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="fromAmount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="fromCurrencySymbol">$</span>
+                                <input type="number" class="form-control" id="fromAmount" placeholder="Enter amount">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-center justify-content-center my-3">
+                        <button class="btn btn-outline-primary" id="swapCurrencies">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="toAmount" class="form-label">Converted Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="toCurrencySymbol">₱</span>
+                                <input type="number" class="form-control" id="toAmount" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="fromCurrency" class="form-label">From Currency</label>
+                            <select class="form-select" id="fromCurrency">
+                                <option value="USD">US Dollar (USD)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                                <option value="GBP">British Pound (GBP)</option>
+                                <option value="JPY">Japanese Yen (JPY)</option>
+                                <option value="AUD">Australian Dollar (AUD)</option>
+                                <option value="CAD">Canadian Dollar (CAD)</option>
+                                <option value="CHF">Swiss Franc (CHF)</option>
+                                <option value="CNY">Chinese Yuan (CNY)</option>
+                                <option value="INR">Indian Rupee (INR)</option>
+                                <option value="NZD">New Zealand Dollar (NZD)</option>
+                                <option value="SGD">Singapore Dollar (SGD)</option>
+                                <option value="HKD">Hong Kong Dollar (HKD)</option>
+                                <option value="PHP">Philippine Peso (PHP)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-center justify-content-center my-3">
+                        <div class="text-center">
+                            <div id="exchangeRate" class="text-muted small">1 USD = 1 USD</div>
+                            <div id="lastUpdated" class="text-muted smaller">Last updated: Never</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="toCurrency" class="form-label">To Currency</label>
+                            <select class="form-select" id="toCurrency">
+                                <option value="PHP">Philippine Peso (PHP)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                                <option value="USD">US Dollar (USD)</option>
+                                <option value="GBP">British Pound (GBP)</option>
+                                <option value="JPY">Japanese Yen (JPY)</option>
+                                <option value="AUD">Australian Dollar (AUD)</option>
+                                <option value="CAD">Canadian Dollar (CAD)</option>
+                                <option value="CHF">Swiss Franc (CHF)</option>
+                                <option value="CNY">Chinese Yuan (CNY)</option>
+                                <option value="INR">Indian Rupee (INR)</option>
+                                <option value="NZD">New Zealand Dollar (NZD)</option>
+                                <option value="SGD">Singapore Dollar (SGD)</option>
+                                <option value="HKD">Hong Kong Dollar (HKD)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-primary" id="refreshRates">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh Rates
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Currency Pairs -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Popular Currency Pairs</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3" id="popularPairs">
+                    <!-- Popular pairs will be populated via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="history-panel">
+        <div class="history-header">
+            <h5>Recent History</h5>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let conversionHistory = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fromAmount = document.getElementById('fromAmount');
+            const toAmount = document.getElementById('toAmount');
+            const fromCurrency = document.getElementById('fromCurrency');
+            const toCurrency = document.getElementById('toCurrency');
+            const fromCurrencySymbol = document.getElementById('fromCurrencySymbol');
+            const toCurrencySymbol = document.getElementById('toCurrencySymbol');
+            const swapButton = document.getElementById('swapCurrencies');
+            const refreshButton = document.getElementById('refreshRates');
+            const exchangeRateDisplay = document.getElementById('exchangeRate');
+            const lastUpdatedDisplay = document.getElementById('lastUpdated');
+            const popularPairs = document.getElementById('popularPairs');
+            const historyList = document.getElementById('historyList');
+
+            // Load history from localStorage if available
+            const savedHistory = localStorage.getItem('currencyConverterHistory');
+            if (savedHistory) {
+                conversionHistory = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
+
+            // Mock exchange rates (in a real app, these would come from an API)
+            const exchangeRates = {
+                USD: 1,
+                EUR: 0.92,
+                GBP: 0.79,
+                JPY: 151.50,
+                AUD: 1.52,
+                CAD: 1.35,
+                CHF: 0.90,
+                CNY: 7.24,
+                INR: 83.30,
+                NZD: 1.66,
+                SGD: 1.35,
+                HKD: 7.82,
+                PHP: 56.50  // Added Philippine Peso rate
+            };
+
+            // Currency symbols
+            const currencySymbols = {
+                USD: '$',
+                EUR: '€',
+                GBP: '£',
+                JPY: '¥',
+                AUD: 'A$',
+                CAD: 'C$',
+                CHF: 'Fr',
+                CNY: '¥',
+                INR: '₹',
+                NZD: 'NZ$',
+                SGD: 'S$',
+                HKD: 'HK$',
+                PHP: '₱'
+            };
+
+            // Popular currency pairs
+            const popularPairsList = [
+                { from: 'USD', to: 'PHP', label: 'USD to PHP' },
+                { from: 'PHP', to: 'USD', label: 'PHP to USD' },
+                { from: 'EUR', to: 'GBP', label: 'EUR to GBP' },
+                { from: 'USD', to: 'JPY', label: 'USD to JPY' },
+                { from: 'USD', to: 'CNY', label: 'USD to CNY' },
+                { from: 'GBP', to: 'USD', label: 'GBP to USD' }
+            ];
+
+            // Function to update currency symbols
+            function updateCurrencySymbols() {
+                fromCurrencySymbol.textContent = currencySymbols[fromCurrency.value];
+                toCurrencySymbol.textContent = currencySymbols[toCurrency.value];
+            }
+
+            // Function to update exchange rate display
+            function updateExchangeRateDisplay() {
+                const rate = exchangeRates[toCurrency.value] / exchangeRates[fromCurrency.value];
+                exchangeRateDisplay.textContent = `1 ${fromCurrency.value} = ${rate.toFixed(4)} ${toCurrency.value}`;
+                lastUpdatedDisplay.textContent = `Last updated: ${new Date().toLocaleString()}`;
+            }
+
+            // Function to convert currency
+            function convert() {
+                const amount = parseFloat(fromAmount.value) || 0;
+                const fromRate = exchangeRates[fromCurrency.value];
+                const toRate = exchangeRates[toCurrency.value];
+                const result = (amount * toRate) / fromRate;
+                toAmount.value = result.toFixed(2);
+                updateExchangeRateDisplay();
+                
+                // Add to history if amount is not zero
+                if (amount !== 0) {
+                    addToHistory(amount, fromCurrency.value, result, toCurrency.value);
+                }
+            }
+
+            // Function to add conversion to history
+            function addToHistory(fromAmount, fromCurrency, toAmount, toCurrency) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Format the calculation string
+                let calculationString = `${fromAmount} ${fromCurrency} = ${toAmount.toFixed(2)} ${toCurrency}`;
+                
+                // Add to beginning of array (newest first)
+                conversionHistory.unshift({
+                    calculation: calculationString,
+                    fromCurrency: fromCurrency,
+                    toCurrency: toCurrency,
+                    timestamp: timeString,
+                    id: Date.now() // Unique ID for each entry
+                });
+                
+                // Keep only the last 10 entries
+                if (conversionHistory.length > 10) {
+                    conversionHistory.pop();
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('currencyConverterHistory', JSON.stringify(conversionHistory));
+                
+                // Update display
+                updateHistoryDisplay();
+            }
+
+            // Function to update history display
+            function updateHistoryDisplay() {
+                historyList.innerHTML = '';
+                
+                if (conversionHistory.length === 0) {
+                    historyList.innerHTML = '<div class="history-empty">No conversions yet</div>';
+                    return;
+                }
+                
+                conversionHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-content">
+                            <div class="history-calculation">${item.calculation}</div>
+                            <div class="history-timestamp">${item.timestamp}</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistoryItem(${item.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+            }
+
+            // Function to populate popular pairs
+            function populatePopularPairs() {
+                popularPairs.innerHTML = '';
+                popularPairsList.forEach(pair => {
+                    const rate = exchangeRates[pair.to] / exchangeRates[pair.from];
+                    const div = document.createElement('div');
+                    div.className = 'col-md-4 col-lg-3';
+                    div.innerHTML = `
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">${pair.label}</h6>
+                                <p class="card-text">1 ${pair.from} = ${rate.toFixed(4)} ${pair.to}</p>
+                                <button class="btn btn-sm btn-outline-primary" onclick="setCurrencyPair('${pair.from}', '${pair.to}')">
+                                    Use This Pair
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    popularPairs.appendChild(div);
+                });
+            }
+
+            // Function to set currency pair
+            window.setCurrencyPair = function(from, to) {
+                fromCurrency.value = from;
+                toCurrency.value = to;
+                updateCurrencySymbols();
+                convert();
+            };
+
+            // Make these functions available globally
+            window.deleteHistoryItem = function(id) {
+                conversionHistory = conversionHistory.filter(item => item.id !== id);
+                localStorage.setItem('currencyConverterHistory', JSON.stringify(conversionHistory));
+                updateHistoryDisplay();
+            };
+
+            window.clearHistory = function() {
+                conversionHistory = [];
+                localStorage.removeItem('currencyConverterHistory');
+                updateHistoryDisplay();
+            };
+
+            // Event listeners
+            fromAmount.addEventListener('input', convert);
+            fromCurrency.addEventListener('change', function() {
+                updateCurrencySymbols();
+                convert();
+            });
+            toCurrency.addEventListener('change', function() {
+                updateCurrencySymbols();
+                convert();
+            });
+
+            swapButton.addEventListener('click', function() {
+                const tempCurrency = fromCurrency.value;
+                fromCurrency.value = toCurrency.value;
+                toCurrency.value = tempCurrency;
+                updateCurrencySymbols();
+                convert();
+            });
+
+            refreshButton.addEventListener('click', function() {
+                // In a real app, this would fetch new rates from an API
+                updateExchangeRateDisplay();
+                refreshButton.disabled = true;
+                setTimeout(() => {
+                    refreshButton.disabled = false;
+                }, 1000);
+            });
+
+            // Initial setup
+            updateCurrencySymbols();
+            convert();
+            populatePopularPairs();
+        });
+    </script>
+} 

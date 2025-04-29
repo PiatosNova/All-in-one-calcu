@@ -1,0 +1,449 @@
+@page
+@model All_in_one_calcu.Pages.Calculators.MiscellaneousModel
+@{
+    ViewData["Title"] = "Miscellaneous Calculator";
+}
+
+<div class="calculator-layout">
+    <div class="calculator-container">
+        <h2 class="mb-4">Miscellaneous Calculator</h2>
+
+        <!-- Calculator Type Selection -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="calculatorType" id="age" value="age" checked>
+                    <label class="btn btn-outline-primary" for="age">
+                        <i class="bi bi-calendar"></i> Age Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="date" value="date">
+                    <label class="btn btn-outline-primary" for="date">
+                        <i class="bi bi-calendar-date"></i> Date Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="time" value="time">
+                    <label class="btn btn-outline-primary" for="time">
+                        <i class="bi bi-clock"></i> Time Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="percentage" value="percentage">
+                    <label class="btn btn-outline-primary" for="percentage">
+                        <i class="bi bi-percent"></i> Percentage Calculator
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Age Calculator -->
+        <div class="card mb-4" id="ageCalculator">
+            <div class="card-header">
+                <h5 class="mb-0">Age Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="birthDate" class="form-label">Birth Date</label>
+                            <input type="date" class="form-control" id="birthDate">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="currentDate" class="form-label">Current Date</label>
+                            <input type="date" class="form-control" id="currentDate">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateAge()">Calculate Age</button>
+                    </div>
+                </div>
+
+                <!-- Age Results -->
+                <div class="mt-4" id="ageResults" style="display: none;">
+                    <h6>Age Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Years:</td>
+                                <td id="ageYears">0</td>
+                            </tr>
+                            <tr>
+                                <td>Months:</td>
+                                <td id="ageMonths">0</td>
+                            </tr>
+                            <tr>
+                                <td>Days:</td>
+                                <td id="ageDays">0</td>
+                            </tr>
+                            <tr>
+                                <td>Total Days:</td>
+                                <td id="ageTotalDays">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Calculator -->
+        <div class="card mb-4" id="dateCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">Date Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateDate()">Calculate</button>
+                    </div>
+                </div>
+
+                <!-- Date Results -->
+                <div class="mt-4" id="dateResults" style="display: none;">
+                    <h6>Date Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Days Between:</td>
+                                <td id="daysBetween">0</td>
+                            </tr>
+                            <tr>
+                                <td>Weeks Between:</td>
+                                <td id="weeksBetween">0</td>
+                            </tr>
+                            <tr>
+                                <td>Months Between:</td>
+                                <td id="monthsBetween">0</td>
+                            </tr>
+                            <tr>
+                                <td>Years Between:</td>
+                                <td id="yearsBetween">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Calculator -->
+        <div class="card mb-4" id="timeCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">Time Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startTime" class="form-label">Start Time</label>
+                            <input type="time" class="form-control" id="startTime">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="endTime" class="form-label">End Time</label>
+                            <input type="time" class="form-control" id="endTime">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateTime()">Calculate</button>
+                    </div>
+                </div>
+
+                <!-- Time Results -->
+                <div class="mt-4" id="timeResults" style="display: none;">
+                    <h6>Time Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Duration:</td>
+                                <td id="timeDuration">0:00</td>
+                            </tr>
+                            <tr>
+                                <td>Hours:</td>
+                                <td id="timeHours">0</td>
+                            </tr>
+                            <tr>
+                                <td>Minutes:</td>
+                                <td id="timeMinutes">0</td>
+                            </tr>
+                            <tr>
+                                <td>Seconds:</td>
+                                <td id="timeSeconds">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Percentage Calculator -->
+        <div class="card mb-4" id="percentageCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">Percentage Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="value" class="form-label">Value</label>
+                            <input type="number" class="form-control" id="value" placeholder="Enter value">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="percentage" class="form-label">Percentage</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="percentage" placeholder="Enter percentage">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculatePercentage()">Calculate</button>
+                    </div>
+                </div>
+
+                <!-- Percentage Results -->
+                <div class="mt-4" id="percentageResults" style="display: none;">
+                    <h6>Percentage Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Percentage of Value:</td>
+                                <td id="percentageOfValue">0</td>
+                            </tr>
+                            <tr>
+                                <td>Value Increased by Percentage:</td>
+                                <td id="valueIncreased">0</td>
+                            </tr>
+                            <tr>
+                                <td>Value Decreased by Percentage:</td>
+                                <td id="valueDecreased">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="history-panel">
+        <div class="history-header">
+            <h5>Recent History</h5>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let calculationHistory = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('currentDate').value = today;
+            document.getElementById('endDate').value = today;
+
+            // Calculator type selection
+            const calculatorTypes = document.querySelectorAll('input[name="calculatorType"]');
+            calculatorTypes.forEach(type => {
+                type.addEventListener('change', function() {
+                    document.getElementById('ageCalculator').style.display = 'none';
+                    document.getElementById('dateCalculator').style.display = 'none';
+                    document.getElementById('timeCalculator').style.display = 'none';
+                    document.getElementById('percentageCalculator').style.display = 'none';
+                    
+                    document.getElementById(this.value + 'Calculator').style.display = 'block';
+                });
+            });
+
+            // Load history from localStorage if available
+            const savedHistory = localStorage.getItem('miscellaneousCalculatorHistory');
+            if (savedHistory) {
+                calculationHistory = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
+        });
+
+        // Function to add calculation to history
+        function addToHistory(calculatorType, calculation, result) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Format the calculation string based on calculator type
+            let calculationString = '';
+            
+            switch(calculatorType) {
+                case 'age':
+                    calculationString = `Age: ${calculation.birthDate} to ${calculation.currentDate}`;
+                    break;
+                case 'date':
+                    calculationString = `Date: ${calculation.startDate} to ${calculation.endDate}`;
+                    break;
+                case 'time':
+                    calculationString = `Time: ${calculation.startTime} to ${calculation.endTime}`;
+                    break;
+                case 'percentage':
+                    calculationString = `Percentage: ${calculation.value} × ${calculation.percentage}%`;
+                    break;
+            }
+            
+            // Add to beginning of array (newest first)
+            calculationHistory.unshift({
+                calculatorType: calculatorType,
+                calculation: calculationString,
+                result: result,
+                timestamp: timeString,
+                id: Date.now() // Unique ID for each entry
+            });
+            
+            // Keep only the last 10 entries
+            if (calculationHistory.length > 10) {
+                calculationHistory.pop();
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('miscellaneousCalculatorHistory', JSON.stringify(calculationHistory));
+            
+            // Update display
+            updateHistoryDisplay();
+        }
+
+        // Function to update history display
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">No calculations yet</div>';
+                return;
+            }
+            
+            calculationHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-content">
+                        <div class="history-calculation">${item.calculation}</div>
+                        <div class="history-result">${item.result}</div>
+                        <div class="history-timestamp">${item.timestamp}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistoryItem(${item.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Function to delete a history item
+        function deleteHistoryItem(id) {
+            calculationHistory = calculationHistory.filter(item => item.id !== id);
+            localStorage.setItem('miscellaneousCalculatorHistory', JSON.stringify(calculationHistory));
+            updateHistoryDisplay();
+        }
+
+        // Function to clear all history
+        function clearHistory() {
+            calculationHistory = [];
+            localStorage.removeItem('miscellaneousCalculatorHistory');
+            updateHistoryDisplay();
+        }
+
+        // Update the existing calculator functions to add history entries
+        const originalCalculateAge = calculateAge;
+        calculateAge = function() {
+            const birthDate = document.getElementById('birthDate').value;
+            const currentDate = document.getElementById('currentDate').value;
+
+            originalCalculateAge();
+
+            if (birthDate && currentDate) {
+                const years = document.getElementById('ageYears').textContent;
+                const months = document.getElementById('ageMonths').textContent;
+                const days = document.getElementById('ageDays').textContent;
+                
+                addToHistory('age', 
+                    { birthDate: birthDate, currentDate: currentDate },
+                    `${years} years, ${months} months, ${days} days`
+                );
+            }
+        };
+
+        const originalCalculateDate = calculateDate;
+        calculateDate = function() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            originalCalculateDate();
+
+            if (startDate && endDate) {
+                const days = document.getElementById('daysBetween').textContent;
+                const weeks = document.getElementById('weeksBetween').textContent;
+                const months = document.getElementById('monthsBetween').textContent;
+                const years = document.getElementById('yearsBetween').textContent;
+                
+                addToHistory('date',
+                    { startDate: startDate, endDate: endDate },
+                    `${days} days, ${weeks} weeks, ${months} months, ${years} years`
+                );
+            }
+        };
+
+        const originalCalculateTime = calculateTime;
+        calculateTime = function() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            originalCalculateTime();
+
+            if (startTime && endTime) {
+                const duration = document.getElementById('timeDuration').textContent;
+                const hours = document.getElementById('timeHours').textContent;
+                const minutes = document.getElementById('timeMinutes').textContent;
+                const seconds = document.getElementById('timeSeconds').textContent;
+                
+                addToHistory('time',
+                    { startTime: startTime, endTime: endTime },
+                    `${duration} (${hours}h ${minutes}m ${seconds}s)`
+                );
+            }
+        };
+
+        const originalCalculatePercentage = calculatePercentage;
+        calculatePercentage = function() {
+            const value = parseFloat(document.getElementById('value').value) || 0;
+            const percentage = parseFloat(document.getElementById('percentage').value) || 0;
+
+            originalCalculatePercentage();
+
+            if (value && percentage) {
+                const percentageOfValue = document.getElementById('percentageOfValue').textContent;
+                const valueIncreased = document.getElementById('valueIncreased').textContent;
+                const valueDecreased = document.getElementById('valueDecreased').textContent;
+                
+                addToHistory('percentage',
+                    { value: value, percentage: percentage },
+                    `${percentageOfValue} (${valueDecreased} to ${valueIncreased})`
+                );
+            }
+        };
+    </script>
+} 

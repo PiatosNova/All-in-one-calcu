@@ -1,0 +1,316 @@
+@page
+@model All_in_one_calcu.Pages.Calculators.UnitConverterModel
+@{
+    ViewData["Title"] = "Unit Converter";
+}
+
+<div class="converter-layout">
+    <div class="converter-container">
+        <h2 class="mb-4">Unit Converter</h2>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group mb-4">
+                    <label for="unitType" class="form-label">Select Unit Type</label>
+                    <select class="form-select" id="unitType">
+                        <option value="length">Length</option>
+                        <option value="weight">Weight</option>
+                        <option value="volume">Volume</option>
+                        <option value="temperature">Temperature</option>
+                        <option value="area">Area</option>
+                        <option value="speed">Speed</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="fromValue" class="form-label">From</label>
+                            <input type="number" class="form-control mb-2" id="fromValue" step="any">
+                            <select class="form-select" id="fromUnit">
+                                <!-- Units will be populated via JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-center justify-content-center my-3">
+                        <button class="btn btn-outline-primary" id="swapUnits">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="toValue" class="form-label">To</label>
+                            <input type="number" class="form-control mb-2" id="toValue" readonly>
+                            <select class="form-select" id="toUnit">
+                                <!-- Units will be populated via JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary" id="calculateBtn">
+                        <i class="bi bi-calculator"></i> Calculate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="history-panel">
+        <div class="history-header">
+            <h5>Recent History</h5>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const unitTypes = {
+            length: ['Meters', 'Kilometers', 'Centimeters', 'Millimeters', 'Miles', 'Yards', 'Feet', 'Inches'],
+            weight: ['Kilograms', 'Grams', 'Milligrams', 'Pounds', 'Ounces'],
+            volume: ['Liters', 'Milliliters', 'Cubic Meters', 'Gallons', 'Quarts', 'Cups'],
+            temperature: ['Celsius', 'Fahrenheit', 'Kelvin'],
+            area: ['Square Meters', 'Square Kilometers', 'Square Miles', 'Square Feet', 'Acres', 'Hectares'],
+            speed: ['Kilometers per Hour', 'Miles per Hour', 'Meters per Second', 'Knots']
+        };
+
+        const conversionRates = {
+            length: {
+                'Meters': 1,
+                'Kilometers': 1000,
+                'Centimeters': 0.01,
+                'Millimeters': 0.001,
+                'Miles': 1609.34,
+                'Yards': 0.9144,
+                'Feet': 0.3048,
+                'Inches': 0.0254
+            },
+            weight: {
+                'Kilograms': 1,
+                'Grams': 0.001,
+                'Milligrams': 0.000001,
+                'Pounds': 0.453592,
+                'Ounces': 0.0283495
+            },
+            volume: {
+                'Liters': 1,
+                'Milliliters': 0.001,
+                'Cubic Meters': 1000,
+                'Gallons': 3.78541,
+                'Quarts': 0.946353,
+                'Cups': 0.236588
+            },
+            temperature: {
+                'Celsius': 1,
+                'Fahrenheit': 1,
+                'Kelvin': 1
+            },
+            area: {
+                'Square Meters': 1,
+                'Square Kilometers': 1000000,
+                'Square Miles': 2589988.11,
+                'Square Feet': 0.092903,
+                'Acres': 4046.86,
+                'Hectares': 10000
+            },
+            speed: {
+                'Kilometers per Hour': 1,
+                'Miles per Hour': 1.60934,
+                'Meters per Second': 3.6,
+                'Knots': 1.852
+            }
+        };
+
+        let conversionHistory = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const unitTypeSelect = document.getElementById('unitType');
+            const fromUnitSelect = document.getElementById('fromUnit');
+            const toUnitSelect = document.getElementById('toUnit');
+            const fromValueInput = document.getElementById('fromValue');
+            const toValueInput = document.getElementById('toValue');
+            const swapButton = document.getElementById('swapUnits');
+            const calculateButton = document.getElementById('calculateBtn');
+            const historyList = document.getElementById('historyList');
+
+            // Load history from localStorage if available
+            const savedHistory = localStorage.getItem('unitConverterHistory');
+            if (savedHistory) {
+                conversionHistory = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
+
+            // Populate units based on selected type
+            function populateUnits() {
+                const selectedType = unitTypeSelect.value;
+                const units = unitTypes[selectedType];
+
+                fromUnitSelect.innerHTML = '';
+                toUnitSelect.innerHTML = '';
+
+                units.forEach(unit => {
+                    fromUnitSelect.add(new Option(unit, unit));
+                    toUnitSelect.add(new Option(unit, unit));
+                });
+
+                // Set default 'to' unit to something different than 'from' unit
+                if (units.length > 1) {
+                    toUnitSelect.selectedIndex = 1;
+                }
+
+                // Clear values when unit type changes
+                fromValueInput.value = '';
+                toValueInput.value = '';
+            }
+
+            // Conversion function
+            function convert() {
+                const fromValue = parseFloat(fromValueInput.value);
+                if (isNaN(fromValue)) {
+                    toValueInput.value = '';
+                    return;
+                }
+
+                const fromUnit = fromUnitSelect.value;
+                const toUnit = toUnitSelect.value;
+                const selectedType = unitTypeSelect.value;
+                
+                let result;
+
+                if (selectedType === 'temperature') {
+                    // Special handling for temperature conversions
+                    result = convertTemperature(fromValue, fromUnit, toUnit);
+                } else {
+                    // Convert to base unit first, then to target unit
+                    const baseValue = fromValue * conversionRates[selectedType][fromUnit];
+                    result = baseValue / conversionRates[selectedType][toUnit];
+                }
+
+                toValueInput.value = result.toFixed(6);
+                
+                // Add to history
+                addToHistory(fromValue, fromUnit, result, toUnit, selectedType);
+            }
+
+            function convertTemperature(value, fromUnit, toUnit) {
+                let celsius;
+                
+                // Convert to Celsius first
+                switch(fromUnit) {
+                    case 'Celsius':
+                        celsius = value;
+                        break;
+                    case 'Fahrenheit':
+                        celsius = (value - 32) * 5/9;
+                        break;
+                    case 'Kelvin':
+                        celsius = value - 273.15;
+                        break;
+                }
+
+                // Convert from Celsius to target unit
+                switch(toUnit) {
+                    case 'Celsius':
+                        return celsius;
+                    case 'Fahrenheit':
+                        return (celsius * 9/5) + 32;
+                    case 'Kelvin':
+                        return celsius + 273.15;
+                }
+            }
+
+            function addToHistory(fromValue, fromUnit, toValue, toUnit, unitType) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Format the calculation string
+                let calculationString = `${fromValue} ${fromUnit} = ${toValue.toFixed(6)} ${toUnit}`;
+                
+                // Add to beginning of array (newest first)
+                conversionHistory.unshift({
+                    calculation: calculationString,
+                    unitType: unitType,
+                    timestamp: timeString,
+                    id: Date.now() // Unique ID for each entry
+                });
+                
+                // Keep only the last 10 entries
+                if (conversionHistory.length > 10) {
+                    conversionHistory.pop();
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('unitConverterHistory', JSON.stringify(conversionHistory));
+                
+                // Update display
+                updateHistoryDisplay();
+            }
+
+            function updateHistoryDisplay() {
+                historyList.innerHTML = '';
+                
+                if (conversionHistory.length === 0) {
+                    historyList.innerHTML = '<div class="history-empty">No conversions yet</div>';
+                    return;
+                }
+                
+                conversionHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-content">
+                            <div class="history-calculation">${item.calculation}</div>
+                            <div class="history-timestamp">${item.timestamp}</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistoryItem(${item.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+            }
+
+            // Make these functions available globally
+            window.deleteHistoryItem = function(id) {
+                conversionHistory = conversionHistory.filter(item => item.id !== id);
+                localStorage.setItem('unitConverterHistory', JSON.stringify(conversionHistory));
+                updateHistoryDisplay();
+            };
+
+            window.clearHistory = function() {
+                conversionHistory = [];
+                localStorage.removeItem('unitConverterHistory');
+                updateHistoryDisplay();
+            };
+
+            // Event listeners
+            unitTypeSelect.addEventListener('change', populateUnits);
+            fromUnitSelect.addEventListener('change', convert);
+            toUnitSelect.addEventListener('change', convert);
+            fromValueInput.addEventListener('input', convert);
+            calculateButton.addEventListener('click', convert);
+
+            swapButton.addEventListener('click', function() {
+                const tempUnit = fromUnitSelect.value;
+                fromUnitSelect.value = toUnitSelect.value;
+                toUnitSelect.value = tempUnit;
+
+                const tempValue = fromValueInput.value;
+                fromValueInput.value = toValueInput.value;
+                toValueInput.value = tempValue;
+
+                convert();
+            });
+
+            // Initial population
+            populateUnits();
+        });
+    </script>
+} 

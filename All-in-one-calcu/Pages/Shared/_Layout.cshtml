@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - All-in-One Calculator</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/All_in_one_calcu.styles.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar bg-dark text-white" id="sidebar">
+            <div class="sidebar-header p-3">
+                <h3>Calculator Hub</h3>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/Standard">
+                        <i class="bi bi-calculator"></i> Standard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/Scientific">
+                        <i class="bi bi-graph-up"></i> Scientific
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/UnitConverter">
+                        <i class="bi bi-arrows-angle-contract"></i> Unit Converter
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/CurrencyConverter">
+                        <i class="bi bi-currency-exchange"></i> Currency
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/Finance">
+                        <i class="bi bi-bank"></i> Finance
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/Health">
+                        <i class="bi bi-heart"></i> Health
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-page="/Calculators/Miscellaneous">
+                        <i class="bi bi-three-dots"></i> Miscellaneous
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content w-100">
+            <header>
+                <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow">
+                    <div class="container-fluid">
+                        <button class="btn btn-link" id="sidebarToggle">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <a class="navbar-brand" asp-page="/Index">All-in-One Calculator</a>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="container mt-4">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    &copy; @DateTime.Now.Year - All-in-One Calculator
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,442 @@
+@page
+@model All_in_one_calcu.Pages.Calculators.HealthModel
+@{
+    ViewData["Title"] = "Health Calculator";
+}
+
+<div class="calculator-layout">
+    <div class="calculator-container">
+        <h2 class="mb-4">Health Calculator</h2>
+
+        <!-- Calculator Type Selection -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="calculatorType" id="bmi" value="bmi" checked>
+                    <label class="btn btn-outline-primary" for="bmi">
+                        <i class="bi bi-person"></i> BMI Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="bmr" value="bmr">
+                    <label class="btn btn-outline-primary" for="bmr">
+                        <i class="bi bi-fire"></i> BMR Calculator
+                    </label>
+
+                    <input type="radio" class="btn-check" name="calculatorType" id="bodyFat" value="bodyFat">
+                    <label class="btn btn-outline-primary" for="bodyFat">
+                        <i class="bi bi-person-badge"></i> Body Fat Calculator
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- BMI Calculator -->
+        <div class="card mb-4" id="bmiCalculator">
+            <div class="card-header">
+                <h5 class="mb-0">BMI Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="weight" class="form-label">Weight</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="weight" placeholder="Enter weight">
+                                <select class="form-select" id="weightUnit" style="max-width: 120px;">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="height" class="form-label">Height</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="height" placeholder="Enter height">
+                                <select class="form-select" id="heightUnit" style="max-width: 120px;">
+                                    <option value="cm">cm</option>
+                                    <option value="inches">inches</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateBMI()">Calculate BMI</button>
+                    </div>
+                </div>
+
+                <!-- BMI Results -->
+                <div class="mt-4" id="bmiResults" style="display: none;">
+                    <h6>BMI Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Your BMI:</td>
+                                <td id="bmiValue">0.0</td>
+                            </tr>
+                            <tr>
+                                <td>Category:</td>
+                                <td id="bmiCategory">-</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <h6>BMI Categories:</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-danger" style="width: 15%">Underweight</div>
+                            <div class="progress-bar bg-success" style="width: 25%">Normal</div>
+                            <div class="progress-bar bg-warning" style="width: 25%">Overweight</div>
+                            <div class="progress-bar bg-danger" style="width: 35%">Obese</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BMR Calculator -->
+        <div class="card mb-4" id="bmrCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">BMR Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="bmrWeight" class="form-label">Weight</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="bmrWeight" placeholder="Enter weight">
+                                <select class="form-select" id="bmrWeightUnit" style="max-width: 120px;">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="bmrHeight" class="form-label">Height</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="bmrHeight" placeholder="Enter height">
+                                <select class="form-select" id="bmrHeightUnit" style="max-width: 120px;">
+                                    <option value="cm">cm</option>
+                                    <option value="inches">inches</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" placeholder="Enter age">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateBMR()">Calculate BMR</button>
+                    </div>
+                </div>
+
+                <!-- BMR Results -->
+                <div class="mt-4" id="bmrResults" style="display: none;">
+                    <h6>BMR Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Your BMR:</td>
+                                <td id="bmrValue">0</td>
+                            </tr>
+                            <tr>
+                                <td>Daily Calories (Sedentary):</td>
+                                <td id="caloriesSedentary">0</td>
+                            </tr>
+                            <tr>
+                                <td>Daily Calories (Light Exercise):</td>
+                                <td id="caloriesLight">0</td>
+                            </tr>
+                            <tr>
+                                <td>Daily Calories (Moderate Exercise):</td>
+                                <td id="caloriesModerate">0</td>
+                            </tr>
+                            <tr>
+                                <td>Daily Calories (Active):</td>
+                                <td id="caloriesActive">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body Fat Calculator -->
+        <div class="card mb-4" id="bodyFatCalculator" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">Body Fat Calculator</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="bfWeight" class="form-label">Weight</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="bfWeight" placeholder="Enter weight">
+                                <select class="form-select" id="bfWeightUnit" style="max-width: 120px;">
+                                    <option value="kg">kg</option>
+                                    <option value="lbs">lbs</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="bfHeight" class="form-label">Height</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="bfHeight" placeholder="Enter height">
+                                <select class="form-select" id="bfHeightUnit" style="max-width: 120px;">
+                                    <option value="cm">cm</option>
+                                    <option value="inches">inches</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="bfAge" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="bfAge" placeholder="Enter age">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="bfGender" class="form-label">Gender</label>
+                            <select class="form-select" id="bfGender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="calculateBodyFat()">Calculate Body Fat</button>
+                    </div>
+                </div>
+
+                <!-- Body Fat Results -->
+                <div class="mt-4" id="bodyFatResults" style="display: none;">
+                    <h6>Body Fat Results</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td>Body Fat Percentage:</td>
+                                <td id="bodyFatValue">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Category:</td>
+                                <td id="bodyFatCategory">-</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Body Fat Categories:</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-danger" style="width: 20%">Essential Fat</div>
+                            <div class="progress-bar bg-success" style="width: 30%">Athletes</div>
+                            <div class="progress-bar bg-warning" style="width: 30%">Fitness</div>
+                            <div class="progress-bar bg-danger" style="width: 20%">Obese</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="history-panel">
+        <div class="history-header">
+            <h5>Recent History</h5>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let calculationHistory = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Calculator type selection
+            const calculatorTypes = document.querySelectorAll('input[name="calculatorType"]');
+            calculatorTypes.forEach(type => {
+                type.addEventListener('change', function() {
+                    document.getElementById('bmiCalculator').style.display = 'none';
+                    document.getElementById('bmrCalculator').style.display = 'none';
+                    document.getElementById('bodyFatCalculator').style.display = 'none';
+                    
+                    document.getElementById(this.value + 'Calculator').style.display = 'block';
+                });
+            });
+
+            // Load history from localStorage if available
+            const savedHistory = localStorage.getItem('healthCalculatorHistory');
+            if (savedHistory) {
+                calculationHistory = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
+        });
+
+        // Function to add calculation to history
+        function addToHistory(calculatorType, calculation, result) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Format the calculation string based on calculator type
+            let calculationString = '';
+            
+            switch(calculatorType) {
+                case 'bmi':
+                    calculationString = `BMI: ${calculation.weight}${calculation.weightUnit} / ${calculation.height}${calculation.heightUnit}`;
+                    break;
+                case 'bmr':
+                    calculationString = `BMR: ${calculation.weight}${calculation.weightUnit}, ${calculation.height}${calculation.heightUnit}, ${calculation.age}y, ${calculation.gender}`;
+                    break;
+                case 'bodyFat':
+                    calculationString = `Body Fat: ${calculation.weight}${calculation.weightUnit}, ${calculation.height}${calculation.heightUnit}, ${calculation.age}y, ${calculation.gender}`;
+                    break;
+            }
+            
+            // Add to beginning of array (newest first)
+            calculationHistory.unshift({
+                calculatorType: calculatorType,
+                calculation: calculationString,
+                result: result,
+                timestamp: timeString,
+                id: Date.now() // Unique ID for each entry
+            });
+            
+            // Keep only the last 10 entries
+            if (calculationHistory.length > 10) {
+                calculationHistory.pop();
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('healthCalculatorHistory', JSON.stringify(calculationHistory));
+            
+            // Update display
+            updateHistoryDisplay();
+        }
+
+        // Function to update history display
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            
+            if (calculationHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">No calculations yet</div>';
+                return;
+            }
+            
+            calculationHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-content">
+                        <div class="history-calculation">${item.calculation}</div>
+                        <div class="history-result">${item.result}</div>
+                        <div class="history-timestamp">${item.timestamp}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistoryItem(${item.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Function to delete a history item
+        function deleteHistoryItem(id) {
+            calculationHistory = calculationHistory.filter(item => item.id !== id);
+            localStorage.setItem('healthCalculatorHistory', JSON.stringify(calculationHistory));
+            updateHistoryDisplay();
+        }
+
+        // Function to clear all history
+        function clearHistory() {
+            calculationHistory = [];
+            localStorage.removeItem('healthCalculatorHistory');
+            updateHistoryDisplay();
+        }
+
+        // Update the existing calculator functions to add history entries
+        const originalCalculateBMI = calculateBMI;
+        calculateBMI = function() {
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const height = parseFloat(document.getElementById('height').value) || 0;
+            const weightUnit = document.getElementById('weightUnit').value;
+            const heightUnit = document.getElementById('heightUnit').value;
+
+            originalCalculateBMI();
+
+            if (weight && height) {
+                const bmi = parseFloat(document.getElementById('bmiValue').textContent);
+                const category = document.getElementById('bmiCategory').textContent;
+                
+                addToHistory('bmi', 
+                    { weight: weight, height: height, weightUnit: weightUnit, heightUnit: heightUnit },
+                    `BMI: ${bmi.toFixed(1)} (${category})`
+                );
+            }
+        };
+
+        const originalCalculateBMR = calculateBMR;
+        calculateBMR = function() {
+            const weight = parseFloat(document.getElementById('bmrWeight').value) || 0;
+            const height = parseFloat(document.getElementById('bmrHeight').value) || 0;
+            const age = parseFloat(document.getElementById('age').value) || 0;
+            const gender = document.getElementById('gender').value;
+            const weightUnit = document.getElementById('bmrWeightUnit').value;
+            const heightUnit = document.getElementById('bmrHeightUnit').value;
+
+            originalCalculateBMR();
+
+            if (weight && height && age) {
+                const bmr = parseFloat(document.getElementById('bmrValue').textContent);
+                
+                addToHistory('bmr',
+                    { weight: weight, height: height, age: age, gender: gender, weightUnit: weightUnit, heightUnit: heightUnit },
+                    `BMR: ${Math.round(bmr)} calories/day`
+                );
+            }
+        };
+
+        const originalCalculateBodyFat = calculateBodyFat;
+        calculateBodyFat = function() {
+            const weight = parseFloat(document.getElementById('bfWeight').value) || 0;
+            const height = parseFloat(document.getElementById('bfHeight').value) || 0;
+            const age = parseFloat(document.getElementById('bfAge').value) || 0;
+            const gender = document.getElementById('bfGender').value;
+            const weightUnit = document.getElementById('bfWeightUnit').value;
+            const heightUnit = document.getElementById('bfHeightUnit').value;
+
+            originalCalculateBodyFat();
+
+            if (weight && height && age) {
+                const bodyFat = parseFloat(document.getElementById('bodyFatValue').textContent);
+                const category = document.getElementById('bodyFatCategory').textContent;
+                
+                addToHistory('bodyFat',
+                    { weight: weight, height: height, age: age, gender: gender, weightUnit: weightUnit, heightUnit: heightUnit },
+                    `Body Fat: ${bodyFat.toFixed(1)}% (${category})`
+                );
+            }
+        };
+    </script>
+} 

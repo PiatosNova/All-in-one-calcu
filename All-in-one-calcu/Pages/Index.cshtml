@@ -1,0 +1,103 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container py-4">
+    <h1 class="display-4 mb-4">All-in-One Calculator Hub</h1>
+    <p class="lead mb-5">Welcome to your comprehensive calculation solution. Choose a calculator type below to get started.</p>
+
+    <div class="row g-4">
+        <!-- Standard Calculator -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-calculator"></i> Standard Calculator
+                    </h5>
+                    <p class="card-text">Basic arithmetic operations for everyday calculations.</p>
+                    <a asp-page="/Calculators/Standard" class="btn btn-primary">Open Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scientific Calculator -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-graph-up"></i> Scientific Calculator
+                    </h5>
+                    <p class="card-text">Advanced mathematical functions and operations.</p>
+                    <a asp-page="/Calculators/Scientific" class="btn btn-primary">Open Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unit Converter -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-arrows-angle-contract"></i> Unit Converter
+                    </h5>
+                    <p class="card-text">Convert between different units of measurement.</p>
+                    <a asp-page="/Calculators/UnitConverter" class="btn btn-primary">Open Converter</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Currency Converter -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-currency-exchange"></i> Currency Converter
+                    </h5>
+                    <p class="card-text">Convert between different world currencies.</p>
+                    <a asp-page="/Calculators/CurrencyConverter" class="btn btn-primary">Open Converter</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Finance Calculator -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-bank"></i> Finance Calculator
+                    </h5>
+                    <p class="card-text">Calculate loans, mortgages, and interest rates.</p>
+                    <a asp-page="/Calculators/Finance" class="btn btn-primary">Open Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Calculator -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-heart"></i> Health Calculator
+                    </h5>
+                    <p class="card-text">Calculate BMI and other health metrics.</p>
+                    <a asp-page="/Calculators/Health" class="btn btn-primary">Open Calculator</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Miscellaneous -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-three-dots"></i> Miscellaneous
+                    </h5>
+                    <p class="card-text">Age, date, time, and other calculations.</p>
+                    <a asp-page="/Calculators/Miscellaneous" class="btn btn-primary">Open Calculator</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
