@@ -55,7 +55,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <button class="btn btn-primary" onclick="calculateAge()">Calculate Age</button>
+                        <button class="btn btn-primary" onclick="calculateAge()">Calculate </button>
                     </div>
                 </div>
 
@@ -203,15 +203,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="percentage" class="form-label">Percentage</label>
+                            <label for="percentageValue" class="form-label">Percentage</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="percentage" placeholder="Enter percentage">
+                                <input type="number" class="form-control" id="percentageValue" placeholder="Enter percentage">
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
                     </div>
                     <div class="col-12">
-                        <button class="btn btn-primary" onclick="calculatePercentage()">Calculate</button>
+                        <button class="btn btn-primary" type="button" onclick="calculatePercentage()">Calculate</button>
                     </div>
                 </div>
 
@@ -367,7 +367,133 @@
             updateHistoryDisplay();
         }
 
-        // Update the existing calculator functions to add history entries
+        // --- Age Calculator ---
+        function calculateAge() {
+            const birthDate = new Date(document.getElementById('birthDate').value);
+            const currentDate = new Date(document.getElementById('currentDate').value);
+
+            if (isNaN(birthDate) || isNaN(currentDate)) {
+                document.getElementById('ageResults').style.display = 'none';
+                return;
+            }
+
+            let years = currentDate.getFullYear() - birthDate.getFullYear();
+            let months = currentDate.getMonth() - birthDate.getMonth();
+            let days = currentDate.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                days += new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const totalDays = Math.floor((currentDate - birthDate) / (1000 * 60 * 60 * 24));
+
+            document.getElementById('ageYears').textContent = years;
+            document.getElementById('ageMonths').textContent = months;
+            document.getElementById('ageDays').textContent = days;
+            document.getElementById('ageTotalDays').textContent = totalDays;
+            document.getElementById('ageResults').style.display = 'block';
+        }
+
+        // --- Date Calculator ---
+        function calculateDate() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+
+            if (isNaN(startDate) || isNaN(endDate)) {
+                document.getElementById('dateResults').style.display = 'none';
+                return;
+            }
+
+            const diffTime = endDate - startDate;
+            const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const weeks = Math.floor(days / 7);
+
+            // Calculate months and years
+            let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+            months += endDate.getMonth() - startDate.getMonth();
+            if (endDate.getDate() < startDate.getDate()) months--;
+
+            let years = Math.floor(months / 12);
+            months = months % 12;
+
+            document.getElementById('daysBetween').textContent = days;
+            document.getElementById('weeksBetween').textContent = weeks;
+            document.getElementById('monthsBetween').textContent = months;
+            document.getElementById('yearsBetween').textContent = years;
+            document.getElementById('dateResults').style.display = 'block';
+        }
+
+        // --- Time Calculator ---
+        function calculateTime() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            if (!startTime || !endTime) {
+                document.getElementById('timeResults').style.display = 'none';
+                return;
+            }
+
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+
+            let start = new Date(0, 0, 0, startHour, startMinute, 0);
+            let end = new Date(0, 0, 0, endHour, endMinute, 0);
+
+            let diff = (end - start) / 1000;
+            if (diff < 0) diff += 24 * 60 * 60;
+
+            const hours = Math.floor(diff / 3600);
+            diff -= hours * 3600;
+            const minutes = Math.floor(diff / 60);
+            const seconds = Math.floor(diff % 60);
+
+            document.getElementById('timeDuration').textContent = `${hours}:${minutes.toString().padStart(2, '0')}`;
+            document.getElementById('timeHours').textContent = hours;
+            document.getElementById('timeMinutes').textContent = minutes;
+            document.getElementById('timeSeconds').textContent = seconds;
+            document.getElementById('timeResults').style.display = 'block';
+        }
+
+        // --- Percentage Calculator ---
+        function calculatePercentage() {
+            const valueRaw = document.getElementById('value').value;
+            const percentageRaw = document.getElementById('percentageValue').value;
+            console.log('Raw Value:', valueRaw, 'Raw Percentage:', percentageRaw);
+            const value = parseFloat(valueRaw);
+            const percentage = parseFloat(percentageRaw);
+            console.log('Parsed Value:', value, 'Parsed Percentage:', percentage);
+
+            if (isNaN(value) || isNaN(percentage)) {
+                alert('Please enter valid numbers for both value and percentage');
+                document.getElementById('percentageResults').style.display = 'none';
+                return;
+            }
+
+            const percentageOfValue = value * (percentage / 100);
+            const valueIncreased = value + percentageOfValue;
+            const valueDecreased = value - percentageOfValue;
+
+            // Format numbers to 2 decimal places
+            document.getElementById('percentageOfValue').textContent = percentageOfValue.toFixed(2);
+            document.getElementById('valueIncreased').textContent = valueIncreased.toFixed(2);
+            document.getElementById('valueDecreased').textContent = valueDecreased.toFixed(2);
+            
+            // Show the results
+            document.getElementById('percentageResults').style.display = 'block';
+
+            // Add to history
+            addToHistory('percentage',
+                { value: value, percentage: percentage },
+                `${percentageOfValue.toFixed(2)} (${valueDecreased.toFixed(2)} to ${valueIncreased.toFixed(2)})`
+            );
+        }
+
+        // --- Wrap calculation functions to add to history ---
         const originalCalculateAge = calculateAge;
         calculateAge = function() {
             const birthDate = document.getElementById('birthDate').value;
@@ -379,7 +505,7 @@
                 const years = document.getElementById('ageYears').textContent;
                 const months = document.getElementById('ageMonths').textContent;
                 const days = document.getElementById('ageDays').textContent;
-                
+
                 addToHistory('age', 
                     { birthDate: birthDate, currentDate: currentDate },
                     `${years} years, ${months} months, ${days} days`
@@ -399,7 +525,7 @@
                 const weeks = document.getElementById('weeksBetween').textContent;
                 const months = document.getElementById('monthsBetween').textContent;
                 const years = document.getElementById('yearsBetween').textContent;
-                
+
                 addToHistory('date',
                     { startDate: startDate, endDate: endDate },
                     `${days} days, ${weeks} weeks, ${months} months, ${years} years`
@@ -419,29 +545,10 @@
                 const hours = document.getElementById('timeHours').textContent;
                 const minutes = document.getElementById('timeMinutes').textContent;
                 const seconds = document.getElementById('timeSeconds').textContent;
-                
+
                 addToHistory('time',
                     { startTime: startTime, endTime: endTime },
                     `${duration} (${hours}h ${minutes}m ${seconds}s)`
-                );
-            }
-        };
-
-        const originalCalculatePercentage = calculatePercentage;
-        calculatePercentage = function() {
-            const value = parseFloat(document.getElementById('value').value) || 0;
-            const percentage = parseFloat(document.getElementById('percentage').value) || 0;
-
-            originalCalculatePercentage();
-
-            if (value && percentage) {
-                const percentageOfValue = document.getElementById('percentageOfValue').textContent;
-                const valueIncreased = document.getElementById('valueIncreased').textContent;
-                const valueDecreased = document.getElementById('valueDecreased').textContent;
-                
-                addToHistory('percentage',
-                    { value: value, percentage: percentage },
-                    `${percentageOfValue} (${valueDecreased} to ${valueIncreased})`
                 );
             }
         };

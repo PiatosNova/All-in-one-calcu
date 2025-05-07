@@ -309,6 +309,21 @@
                 convert();
             });
 
+            // Handle hash-based navigation
+            function handleHashNavigation() {
+                const hash = window.location.hash.substring(1); // Remove the # symbol
+                if (hash && unitTypes[hash]) {
+                    unitTypeSelect.value = hash;
+                    populateUnits();
+                }
+            }
+
+            // Initial hash check
+            handleHashNavigation();
+
+            // Listen for hash changes
+            window.addEventListener('hashchange', handleHashNavigation);
+
             // Initial population
             populateUnits();
         });

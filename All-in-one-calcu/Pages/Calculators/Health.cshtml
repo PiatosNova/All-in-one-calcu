@@ -1,4 +1,4 @@
-@page
+    @page
 @model All_in_one_calcu.Pages.Calculators.HealthModel
 @{
     ViewData["Title"] = "Health Calculator";
@@ -285,6 +285,27 @@
                 });
             });
 
+            // Handle hash-based navigation
+            function handleHashNavigation() {
+                const hash = window.location.hash.substring(1); // Remove the # symbol
+                if (hash) {
+                    const radio = document.getElementById(hash);
+                    if (radio) {
+                        radio.checked = true;
+                        document.getElementById('bmiCalculator').style.display = 'none';
+                        document.getElementById('bmrCalculator').style.display = 'none';
+                        document.getElementById('bodyFatCalculator').style.display = 'none';
+                        document.getElementById(hash + 'Calculator').style.display = 'block';
+                    }
+                }
+            }
+
+            // Initial hash check
+            handleHashNavigation();
+
+            // Listen for hash changes
+            window.addEventListener('hashchange', handleHashNavigation);
+
             // Load history from localStorage if available
             const savedHistory = localStorage.getItem('healthCalculatorHistory');
             if (savedHistory) {
@@ -438,5 +459,112 @@
                 );
             }
         };
+
+        // --- BMI Calculator ---
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const weightUnit = document.getElementById('weightUnit').value;
+            const heightUnit = document.getElementById('heightUnit').value;
+
+            if (!weight || !height) {
+                document.getElementById('bmiResults').style.display = 'none';
+                return;
+            }
+
+            // Convert units to kg and meters
+            let weightKg = weightUnit === 'kg' ? weight : weight * 0.453592;
+            let heightM = heightUnit === 'cm' ? height / 100 : height * 0.0254;
+
+            const bmi = weightKg / (heightM * heightM);
+            let category = '-';
+            if (bmi < 18.5) category = 'Underweight';
+            else if (bmi < 25) category = 'Normal';
+            else if (bmi < 30) category = 'Overweight';
+            else category = 'Obese';
+
+            document.getElementById('bmiValue').textContent = bmi.toFixed(1);
+            document.getElementById('bmiCategory').textContent = category;
+            document.getElementById('bmiResults').style.display = 'block';
+        }
+
+        // --- BMR Calculator ---
+        function calculateBMR() {
+            const weight = parseFloat(document.getElementById('bmrWeight').value);
+            const height = parseFloat(document.getElementById('bmrHeight').value);
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const weightUnit = document.getElementById('bmrWeightUnit').value;
+            const heightUnit = document.getElementById('bmrHeightUnit').value;
+
+            if (!weight || !height || !age) {
+                document.getElementById('bmrResults').style.display = 'none';
+                return;
+            }
+
+            // Convert units to kg and cm
+            let weightKg = weightUnit === 'kg' ? weight : weight * 0.453592;
+            let heightCm = heightUnit === 'cm' ? height : height * 2.54;
+
+            let bmr = 0;
+            if (gender === 'male') {
+                bmr = 88.362 + (13.397 * weightKg) + (4.799 * heightCm) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weightKg) + (3.098 * heightCm) - (4.330 * age);
+            }
+
+            // Daily calories for different activity levels
+            const sedentary = bmr * 1.2;
+            const light = bmr * 1.375;
+            const moderate = bmr * 1.55;
+            const active = bmr * 1.725;
+
+            document.getElementById('bmrValue').textContent = Math.round(bmr);
+            document.getElementById('caloriesSedentary').textContent = Math.round(sedentary);
+            document.getElementById('caloriesLight').textContent = Math.round(light);
+            document.getElementById('caloriesModerate').textContent = Math.round(moderate);
+            document.getElementById('caloriesActive').textContent = Math.round(active);
+            document.getElementById('bmrResults').style.display = 'block';
+        }
+
+        // --- Body Fat Calculator ---
+        function calculateBodyFat() {
+            const weight = parseFloat(document.getElementById('bfWeight').value);
+            const height = parseFloat(document.getElementById('bfHeight').value);
+            const age = parseFloat(document.getElementById('bfAge').value);
+            const gender = document.getElementById('bfGender').value;
+            const weightUnit = document.getElementById('bfWeightUnit').value;
+            const heightUnit = document.getElementById('bfHeightUnit').value;
+
+            if (!weight || !height || !age) {
+                document.getElementById('bodyFatResults').style.display = 'none';
+                return;
+            }
+
+            // Convert units to kg and cm
+            let weightKg = weightUnit === 'kg' ? weight : weight * 0.453592;
+            let heightCm = heightUnit === 'cm' ? height : height * 2.54;
+
+            // Body fat % formula (Deurenberg formula)
+            let bodyFat = 1.20 * (weightKg / ((heightCm / 100) ** 2)) + 0.23 * age - 10.8 * (gender === 'male' ? 1 : 0) - 5.4;
+            let category = '-';
+            if (gender === 'male') {
+                if (bodyFat < 6) category = 'Essential Fat';
+                else if (bodyFat < 14) category = 'Athletes';
+                else if (bodyFat < 18) category = 'Fitness';
+                else if (bodyFat < 25) category = 'Average';
+                else category = 'Obese';
+            } else {
+                if (bodyFat < 14) category = 'Essential Fat';
+                else if (bodyFat < 21) category = 'Athletes';
+                else if (bodyFat < 25) category = 'Fitness';
+                else if (bodyFat < 32) category = 'Average';
+                else category = 'Obese';
+            }
+
+            document.getElementById('bodyFatValue').textContent = bodyFat.toFixed(1) + '%';
+            document.getElementById('bodyFatCategory').textContent = category;
+            document.getElementById('bodyFatResults').style.display = 'block';
+        }
     </script>
 } 
